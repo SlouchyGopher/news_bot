@@ -1,0 +1,31 @@
+name: Щоденні новини в Telegram
+
+on:
+  # Запуск за розкладом. Час вказано в UTC!
+  # 05:00 UTC = 08:00 за київським часом (літній час, UTC+3).
+  # Взимку (UTC+2) це буде 07:00 за Києвом — за бажання зміните на "0 6 * * *".
+  schedule:
+    - cron: "0 5 * * *"
+  # Дозволяє також запускати вручну кнопкою (зручно для тесту).
+  workflow_dispatch:
+
+jobs:
+  send-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Завантажити код
+        uses: actions/checkout@v4
+
+      - name: Встановити Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Встановити бібліотеки
+        run: pip install -r requirements.txt
+
+      - name: Запустити скрипт
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python daily_news_bot.py
